@@ -1,0 +1,27 @@
+How to open the data from the minOI bucket: 
+
+# import tools you need 
+import s3fs
+import xarray as xr
+
+# open the webside with the bucket 
+fsg = s3fs.S3FileSystem(anon=False,
+      client_kwargs={
+         'endpoint_url': 'https://karen.uiogeo-apps.sigma2.no'
+      })
+
+# chose which map you want to look into --> here 'velocity-u'
+fsg.ls('velocity-u')
+
+#to open everything 
+s3path = 's3://velocity-u/CREG12.L75-REF08*.nc' #making a path with all the files 
+remote_files = fsg.glob(s3path)  #uses globe to open more files at the same time 
+remote_files   # printing out the files 
+
+# 
+# Iterate through remote_files to create a fileset
+fileset = [fsg.open(file) for file in remote_files]
+
+# This works
+dset = xr.open_mfdataset(fileset, combine='by_coords')
+
