@@ -14,7 +14,15 @@ fsg = s3fs.S3FileSystem(anon=False,
 fsg.ls('velocity-u')
 
 #to open everything 
-s3path = 's3://velocity-u/CREG12.L75-REF08*.nc' #making a path with all the files 
+# NB!!! rewrite to zarr, netcdf to slow! 
+s3path = 's3://velocity-u/CREG12.L75-REF08*.zarr' #making a path with all the files 
+
+# with zarr:
+store = s3fs.S3Map(root=data_path, s3=fsg, check=False)
+ds = xr.open_zarr(store=store, consolidated=True)
+ds 
+
+-------------------------------------------------------------------
 remote_files = fsg.glob(s3path)  #uses globe to open more files at the same time 
 remote_files   # printing out the files 
 
